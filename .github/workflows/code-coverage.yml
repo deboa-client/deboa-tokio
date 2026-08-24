@@ -15,7 +15,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: true      
+          
       - name: Generate code coverage
         run: |
           CARGO_INCREMENTAL=0 cargo +nightly tarpaulin --verbose --workspace --timeout 120 --engine llvm --out xml -- --test-threads 1
