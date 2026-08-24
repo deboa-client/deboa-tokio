@@ -26,9 +26,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-
-      - name: Fetch tests submobule
-        run: git submodule update --init --recursive        
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: true        
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
@@ -52,9 +52,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-
-      - name: Fetch tests submobule
-        run: git submodule update --init --recursive
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: true        
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
@@ -74,9 +74,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-
-      - name: Fetch tests submobule
-        run: git submodule update --init --recursive
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: true        
                 
       - name: Install Rust toolchains
         run: rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android

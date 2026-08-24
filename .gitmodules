@@ -1,3 +1,3 @@
 [submodule "deboa-test-utils"]
 	path = deboa-test-utils
-	url = git@github.com:deboa-client/deboa-test-utils.git
+	url = ../deboa-test-utils.git
