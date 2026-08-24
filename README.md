@@ -1,6 +1,6 @@
 # deboa-tokio
 
-[![Crates.io downloads](https://img.shields.io/crates/d/deboa-tokio)](https://crates.io/crates/deboa-tokio) [![crates.io](https://img.shields.io/crates/v/deboa-tokio?style=flat-square)](https://crates.io/crates/deboa-tokio) [![Build Status](https://github.com/ararog/deboa/actions/workflows/rust.yml/badge.svg?event=push)](https://github.com/ararog/deboa/actions/workflows/rust.yml) ![Crates.io MSRV](https://img.shields.io/crates/msrv/deboa-tokio) [![Documentation](https://docs.rs/deboa-tokio/badge.svg)](https://docs.rs/deboa-tokio/latesto/deboa_tokio) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ararog/deboa/blob/main/LICENSE.md)  [![codecov](https://codecov.io/gh/ararog/deboa/graph/badge.svg?token=T0HSBAPVSI)](https://codecov.io/gh/ararog/deboa)
+[![Crates.io downloads](https://img.shields.io/crates/d/deboa-tokio)](https://crates.io/crates/deboa-tokio) [![crates.io](https://img.shields.io/crates/v/deboa-tokio?style=flat-square)](https://crates.io/crates/deboa-tokio) [![Build Status](https://github.com/deboa-client/deboa/actions/workflows/rust.yml/badge.svg?event=push)](https://github.com/deboa-client/deboa-tokio/actions/workflows/rust.yml) ![Crates.io MSRV](https://img.shields.io/crates/msrv/deboa-tokio) [![Documentation](https://docs.rs/deboa-tokio/badge.svg)](https://docs.rs/deboa-tokio/latesto/deboa_tokio) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/deboa-client/deboa-tokio/blob/main/LICENSE.md)  [![codecov](https://codecov.io/gh/deboa-client/deboa-tokio/graph/badge.svg?token=T0HSBAPVSI)](https://codecov.io/gh/deboa-client/deboa-tokio)
 
 ## Description
 
@@ -8,7 +8,7 @@
 
 ## Attention
 
-This release has a major api change. Please check the [migration guide](https://github.com/ararog/deboa/blob/main/MIGRATION_GUIDE.md) for more information.
+This release has a major api change. Please check the [migration guide](https://github.com/deboa-client/deboa/blob/main/MIGRATION_GUIDE.md) for more information.
 
 ## Features
 
@@ -46,8 +46,8 @@ Either run from command line:
 Or add to your `Cargo.toml`:
 
 ```toml
-deboa = { version = "0.1.0-beta.23" }
-deboa-tokio = { version = "0.1.0-beta.12" }
+deboa = { version = "0.1.4" }
+deboa-tokio = { version = "0.1.1" }
 http = "1.3.1"
 ```
 
@@ -147,7 +147,7 @@ async fn main() -> Result<()> {
 
 You can create a new project from the template using `cargo generate`:
 
-`cargo generate ararog/deboa-templates`
+`cargo generate deboa-client/deboa-templates`
 
 ## License
 
