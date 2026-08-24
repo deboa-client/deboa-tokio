@@ -17,14 +17,14 @@ rust-version = "1.85.0"
 [workspace.dependencies]
 async-executor = { version = "1.13.3", default-features = false }
 async-lock = "3.4.2"
-base64 = { version = "0.23.0" }
+base64 = { version = "0.23.1" }
 bytes = { version = "1.11" }
 caramelo = "0.1.2"
 cookie = { version = "0.18.1" }
-deboa = { version = ">= 0.1.4" }
-deboa-extras = { version = "0.1.0" }
-deboa-fory = { version = "0.1.5" }
-deboa-macros = { version = "0.0.9" }
+deboa = { version = "0.1.5-beta.1" }
+deboa-extras = { version = "0.1.1-beta.1" }
+deboa-fory = { version = "0.1.8-beta.1" }
+deboa-macros = { version = "0.1.0-beta.6" }
 deboa-test-utils = { path = "deboa-test-utils" }
 env_logger = "0.11.11"
 futures-util = { version = "0.3.31", default-features = false }
@@ -43,8 +43,8 @@ rstest = "0.26.1"
 serde = { version = "1.0.217", features = ["derive"] }
 tackle = { version = "0.1.1"}
 url = "2.5.8"
-vamo = "0.1.1"
-vamo-macros = "0.1.1"
+vamo = "0.1.2-beta.1"
+vamo-macros = "0.1.2-beta.1"
 
 [profile.test]
 lto = false
@@ -55,11 +55,3 @@ opt-level = "z"
 lto = true
 codegen-units = 1
 panic = "abort"
-
-# The bindings depend on the *published* `deboa`, so a change to the core cannot
-# be built or tested locally without this. A patch rather than a path dependency
-# because `deboa-extras`, `vamo` and `deboa-fory` also depend on the published
-# crate — a path dep puts two versions of `deboa` in the graph and their traits
-# stop matching.
-#[patch.crates-io]
-#deboa = { path = "deboa" }
