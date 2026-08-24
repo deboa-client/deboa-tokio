@@ -50,6 +50,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      - name: Fetch tests submobule
+        run: git submodule update --init --recursive
+
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
 
