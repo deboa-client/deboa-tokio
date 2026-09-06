@@ -1,33 +1,36 @@
 //! TLS implementation using rustls
 
-use crate::cert::{DeboaCertificate, DeboaIdentity};
+use std::{borrow::Cow, net::IpAddr, sync::Arc};
+
+use crate::{
+    cert::{DeboaCertificate, DeboaIdentity},
+    client::http::conn::TcpStreamFactory,
+};
 use deboa::{
+    conn::ConnectionConfig,
     errors::{ConnectionError, DeboaError},
     Result,
 };
+use http::Version;
+use log::info;
 use rustls::{
-    crypto::CryptoProvider,
     pki_types::{CertificateDer, PrivateKeyDer},
     ClientConfig,
 };
+use tokio::net::TcpStream;
+use tokio_rustls::client::TlsStream;
 
-pub(crate) fn default_provider() -> CryptoProvider {
-    #[cfg(feature = "__rustls_aws_lc_rs")]
-    return rustls::crypto::aws_lc_rs::default_provider();
-    #[cfg(feature = "__rustls_ring")]
-    return rustls::crypto::ring::default_provider();
-}
+pub(crate) struct RustlsStreamFactory {}
 
-#[inline]
-pub(crate) fn alpn() -> Vec<Vec<u8>> {
-    vec![
-        #[cfg(feature = "http3")]
-        b"h3".to_vec(),
-        #[cfg(feature = "http2")]
-        b"h2".to_vec(),
-        #[cfg(feature = "http1")]
-        b"http/1.1".to_vec(),
-    ]
+impl RustlsStreamFactory {
+    pub async fn connect<'a>(
+        ip: &IpAddr,
+        port: u16,
+        config: &'a ConnectionConfig<'a, DeboaIdentity, DeboaCertificate>,
+    ) -> Result<TlsStream<TcpStream>> {
+        let tcp_stream = TcpStreamFactory::connect(ip, port).await?;
+        connect_with_rustls(tcp_stream, config).await
+    }
 }
 
 /// Builder for TLS connections using rustls
@@ -36,7 +39,6 @@ pub struct TlsConnectionBuilder<'a> {
     certificate: Option<&'a DeboaCertificate>,
     skip_server_verification: bool,
     alpn: Vec<Vec<u8>>,
-    provider: CryptoProvider,
 }
 
 impl Default for TlsConnectionBuilder<'_> {
@@ -45,8 +47,7 @@ impl Default for TlsConnectionBuilder<'_> {
             identity: None,
             certificate: None,
             skip_server_verification: false,
-            alpn: alpn(),
-            provider: default_provider(),
+            alpn: Vec::new(),
         }
     }
 }
@@ -82,20 +83,16 @@ impl<'a> TlsConnectionBuilder<'a> {
             if self.skip_server_verification {
                 ClientConfig::builder()
                     .dangerous()
-                    .with_custom_certificate_verifier(
-                        deboa_tls::rust::verify::SkipServerVerification::new(self.provider),
-                    )
+                    .with_custom_certificate_verifier(Arc::new(
+                        deboa_tls::rustls::verify::SkipServerVerification::default(),
+                    ))
                     .with_no_client_auth()
             } else {
+                // TODO: Add support to ECH
+
                 #[cfg(feature = "__webpki_rustls_verifier")]
                 let config = {
-                    let config = ClientConfig::builder_with_provider(self.provider.into())
-                        .with_protocol_versions(rustls::ALL_VERSIONS)
-                        .map_err(|e| {
-                            DeboaError::Connection(ConnectionError::Tls {
-                                message: format!("Failed to set TLS version: {}", e),
-                            })
-                        })?;
+                    let config = ClientConfig::builder_with_protocol_versions(rustls::ALL_VERSIONS);
 
                     let mut root_store =
                         rustls::RootCertStore { roots: webpki_roots::TLS_SERVER_ROOTS.to_vec() };
@@ -130,14 +127,13 @@ impl<'a> TlsConnectionBuilder<'a> {
                 #[cfg(feature = "__platform_rustls_verifier")]
                 let config = {
                     use rustls_platform_verifier::BuilderVerifierExt;
-                    rustls::ClientConfig::builder_with_provider(default_provider())
-                        .with_protocol_versions(rustls::ALL_VERSIONS)
+                    rustls::ClientConfig::builder_with_protocol_versions(rustls::ALL_VERSIONS)
+                        .with_platform_verifier()
                         .map_err(|e| {
                             DeboaError::Connection(ConnectionError::Tls {
-                                message: format!("Failed to set TLS version: {}", e),
+                                message: format!("Failed to load platform verifier: {}", e),
                             })
                         })?
-                        .with_platform_verifier()
                 };
 
                 let mut config = if let Some(id) = self.identity {
@@ -172,7 +168,39 @@ impl<'a> TlsConnectionBuilder<'a> {
     }
 }
 
-#[cfg(any(feature = "http1", feature = "http2"))]
+/// Create a TlsStream out of TcpStream
+pub async fn connect_with_rustls<'a>(
+    tcp_stream: TcpStream,
+    config: &ConnectionConfig<'a, DeboaIdentity, DeboaCertificate>,
+) -> Result<TlsStream<TcpStream>> {
+    use crate::client::tls::rustls::{tcp::connect, TlsConnectionBuilder};
+    let tls_config = TlsConnectionBuilder::default()
+        .certificate(config.certificate())
+        .identity(config.identity())
+        .build_config()?;
+
+    let stream = connect(tls_config, tcp_stream, config.host()).await?;
+
+    if let Some(alpn) = stream
+        .get_ref()
+        .1
+        .alpn_protocol()
+    {
+        let Cow::Borrowed(alpn_code) = String::from_utf8_lossy(alpn) else {
+            return Err(DeboaError::Connection(ConnectionError::Tcp {
+                message: "Invalid ALPN code".to_string(),
+            }));
+        };
+
+        let version: Version = deboa::Alpn::new(alpn_code).into();
+        info!("ALPN info found, switching connection to {:?}", version);
+        Ok(stream)
+    } else {
+        info!("No ALPN info available, falling back to HTTP/1.1");
+        Ok(stream)
+    }
+}
+
 /// TCP connection module for TLS
 pub mod tcp {
     use deboa::{
@@ -211,7 +239,7 @@ pub mod tcp {
 /// UDP connection module for TLS
 pub mod udp {
     use deboa::{
-        errors::{http::ConnectionError, DeboaError},
+        errors::{ConnectionError, DeboaError},
         Result,
     };
     use h3_quinn::Connection;

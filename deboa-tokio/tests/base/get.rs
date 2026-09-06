@@ -21,8 +21,12 @@ async fn test_get_http(
     #[future] create_server: EasyHttpMock<VetisAdapter>,
     protocol_version: http::Version,
 ) -> TestResult<()> {
-    deboa_test_utils::vamo::test_get(create_client, &mut create_server.await, protocol_version)
-        .await
+    deboa_test_utils::base::get::test_get_http(
+        &create_client,
+        &mut create_server.await,
+        protocol_version,
+    )
+    .await
 }
 
 #[rstest]
@@ -175,7 +179,6 @@ async fn test_try_into(
     deboa_test_utils::base::get::test_try_into(&create_client, &mut create_server.await).await
 }
 
-/*
 #[rstest]
 #[tokio::test]
 async fn test_fetch_from_str(
@@ -185,4 +188,3 @@ async fn test_fetch_from_str(
 ) -> TestResult<()> {
     deboa_test_utils::base::get::test_fetch_from_str(&create_client, &mut create_server.await).await
 }
-*/

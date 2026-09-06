@@ -4,11 +4,40 @@ use crate::{
 };
 use deboa::{
     dns::DnsResolver,
-    errors::{ConnectionError, DeboaError},
+    errors::{ConnectionError, DeboaError, RequestError},
     Result,
 };
 use hashbrown::HashMap;
 use std::time::Duration;
+
+/// A HttoConnectionPool builder for easy pool creation
+pub struct HttpConnectionPoolBuilder {
+    max_idle_connections: u32,
+    keep_alive_duration: Duration,
+}
+
+impl HttpConnectionPoolBuilder {
+    /// Set max idle connections
+    pub fn max_idle_connections(mut self, max_idle_connections: u32) -> Self {
+        self.max_idle_connections = max_idle_connections;
+        self
+    }
+
+    /// Set keep alive duration
+    pub fn keep_alive_duration(mut self, keep_alive_duration: Duration) -> Self {
+        self.keep_alive_duration = keep_alive_duration;
+        self
+    }
+
+    /// Build http connection pool
+    pub fn build(self) -> HttpConnectionPool {
+        HttpConnectionPool {
+            max_idle_connections: self.max_idle_connections,
+            keep_alive_duration: self.keep_alive_duration,
+            connections: HashMap::new(),
+        }
+    }
+}
 
 /// Struct that represents the HTTP connection pool.
 ///
@@ -38,24 +67,32 @@ impl Default for HttpConnectionPool {
 }
 
 impl HttpConnectionPool {
-    /// Allow set max idle connections
-    ///
-    /// # Arguments
-    ///
-    /// * `max_idle_connections` - The max idle connections.
-    ///
-    pub fn set_max_idle_connections(&mut self, max_idle_connections: u32) {
-        self.max_idle_connections = max_idle_connections;
+    /// Create a new HttpConnectionPool builder
+    pub fn builder() -> HttpConnectionPoolBuilder {
+        HttpConnectionPoolBuilder {
+            max_idle_connections: 5,
+            keep_alive_duration: Duration::from_mins(5),
+        }
     }
 
-    /// Allow set keep alive duration
+    /// Allow read max idle connections
     ///
     /// # Arguments
     ///
-    /// * `keep_alive_duration` - The keep alive duration.
+    /// * `u32` - The max idle connections.
     ///
-    pub fn set_keep_alive_duration(&mut self, keep_alive_duration: Duration) {
-        self.keep_alive_duration = keep_alive_duration;
+    pub fn max_idle_connections(&self) -> u32 {
+        self.max_idle_connections
+    }
+
+    /// Allow read keep alive duration
+    ///
+    /// # Arguments
+    ///
+    /// * `Durantion` - The keep alive duration.
+    ///
+    pub fn keep_alive_duration(&self) -> Duration {
+        self.keep_alive_duration
     }
 }
 
@@ -64,10 +101,6 @@ impl deboa::conn::HttpConnectionPool for HttpConnectionPool {
     type Certificate = DeboaCertificate;
     type ConnectionDispather = DeboaConnection;
     type ConnectionCache = HashMap<String, DeboaConnection>;
-
-    fn new(max_idle_connections: u32, keep_alive_duration: Duration) -> Self {
-        Self { max_idle_connections, keep_alive_duration, connections: HashMap::new() }
-    }
 
     #[inline]
     fn connections(&self) -> &Self::ConnectionCache {
@@ -101,9 +134,36 @@ impl deboa::conn::HttpConnectionPool for HttpConnectionPool {
         }
 
         log::debug!("Creating new connection for {}", key);
+        let ips = dns_resolver
+            .resolve(
+                config
+                    .host()
+                    .to_string(),
+                config.port(),
+            )
+            .await?;
+        let ips = if config
+            .client_bind_addr()
+            .is_ipv4()
+        {
+            ips.into_iter()
+                .filter(|ip| ip.is_ipv4())
+                .collect::<Vec<_>>()
+        } else {
+            ips.into_iter()
+                .filter(|ip| ip.is_ipv6())
+                .collect::<Vec<_>>()
+        };
+
+        let Some(ip) = ips.first() else {
+            return Err(DeboaError::Request(RequestError::Send {
+                message: format!("No IP addresses found for hostname: {}", config.host()),
+            }));
+        };
+
         let connection = tokio::time::timeout(
             config.connection_timeout(),
-            ConnectionFactory::create_connection(config, dns_resolver),
+            ConnectionFactory::create_connection(config, ip),
         )
         .await
         .map_err(|_| {

@@ -36,9 +36,6 @@ compile_error!("HTTP2 requires native-tls or rust-tls support.");
 #[cfg(all(feature = "native-tls", feature = "http3"))]
 compile_error!("HTTP3 is not supported within native-tls runtime.");
 
-#[cfg(not(any(feature = "http1", feature = "http2", feature = "http3")))]
-compile_error!("At least one HTTP version feature must be enabled.");
-
 /// Certificate management module for handling SSL/TLS certificates.
 pub mod cert;
 /// Internal module for HTTP and Websockets clients implementations.

@@ -7,7 +7,6 @@
 /// Connection management functionality for the Deboa HTTP client.
 pub mod conn;
 
-#[cfg(feature = "http1")]
 pub(crate) mod http1;
 #[cfg(feature = "http2")]
 pub(crate) mod http2;
