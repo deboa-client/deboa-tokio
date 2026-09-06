@@ -11,5 +11,3 @@ Please make sure:
 - [ ] The code is committed with a message that follows the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
 If you performed any of the above steps, please clear the text and give a new description.
-
-  
