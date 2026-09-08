@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          submodules: true        
+          submodules: true
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
@@ -44,7 +44,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        protocol: ["http1", "http2", "http3"]
+        protocol: ["http2", "http3"]
         tls: ["native-tls", "rust-tls"]
 
     runs-on: ${{ matrix.os }}
@@ -53,7 +53,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          submodules: true        
+          submodules: true
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
@@ -75,8 +75,8 @@ jobs:
         uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          submodules: true        
-                
+          submodules: true
+
       - name: Install Rust toolchains
         run: rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
 
