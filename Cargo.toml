@@ -42,7 +42,7 @@ hyper-util = { version = "0.1.20", features = [
 ], default-features = false }
 multer = "3.1.0"
 rand = "0.10.2"
-rstest = "0.26.1"
+rstest = "0.27.0"
 serde = { version = "1.0.217", features = ["derive"] }
 tackle = { version = "0.1.1"}
 url = "2.5.8"
