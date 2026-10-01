@@ -24,7 +24,8 @@ features = [
 [features]
 default = [
   "http2",
-  #"http3",
+  "http3",
+  #"native-tls",
   "rust-tls",
   "default-rustls-provider",
   "default-rustls-verifier",
@@ -133,16 +134,16 @@ criterion = { version = "0.8.2", features = [
   "async_tokio",
 ] }
 deboa-test-utils = { workspace = true }
-# easyhttpmock-vetis-tokio = { path = "../../easyhttpmock-vetis-tokio", features = [
-#   "http2",
-#   #"http3",
-#   "rust-tls",
-# ], default-features = false }
-easyhttpmock-vetis-tokio = { version = "0.1.2-beta.1", features = [
+easyhttpmock-vetis-tokio = { path = "../../easyhttpmock-vetis-tokio", features = [
   "http2",
   #"http3",
   "rust-tls",
 ], default-features = false }
+# easyhttpmock-vetis-tokio = { version = "0.1.2-beta.1", features = [
+#   "http2",
+#   #"http3",
+#   "rust-tls",
+# ], default-features = false }
 futures-util = { version = "0.3.31", default-features = false }
 multer = "3.1.0"
 rstest.workspace = true
