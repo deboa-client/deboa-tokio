@@ -53,7 +53,6 @@ http = "1.3.1"
 
 ## Crate features
 
-- http1
 - http2 (default)
 - http3
 - rust-tls (default)
