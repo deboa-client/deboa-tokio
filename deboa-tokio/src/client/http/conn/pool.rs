@@ -1,6 +1,6 @@
 use crate::{
     cert::{DeboaCertificate, DeboaIdentity},
-    client::http::conn::{ConnectionConfig, ConnectionFactory, DeboaConnection},
+    client::http::conn::{create_connection, ConnectionConfig, DeboaConnection},
 };
 use deboa::{
     dns::DnsResolver,
@@ -115,7 +115,7 @@ impl deboa::conn::HttpConnectionPool for HttpConnectionPool {
 
     async fn create_connection<'a, D>(
         &mut self,
-        config: &ConnectionConfig<'a, Self::Identity, Self::Certificate>,
+        config: &mut ConnectionConfig<'a, Self::Identity, Self::Certificate>,
         dns_resolver: &D,
     ) -> Result<&mut DeboaConnection>
     where
@@ -134,7 +134,7 @@ impl deboa::conn::HttpConnectionPool for HttpConnectionPool {
         }
 
         log::debug!("Creating new connection for {}", key);
-        let ips = dns_resolver
+        let dns_response = dns_resolver
             .resolve(
                 config
                     .host()
@@ -146,11 +146,15 @@ impl deboa::conn::HttpConnectionPool for HttpConnectionPool {
             .client_bind_addr()
             .is_ipv4()
         {
-            ips.into_iter()
+            dns_response
+                .addresses()
+                .into_iter()
                 .filter(|ip| ip.is_ipv4())
                 .collect::<Vec<_>>()
         } else {
-            ips.into_iter()
+            dns_response
+                .addresses()
+                .into_iter()
                 .filter(|ip| ip.is_ipv6())
                 .collect::<Vec<_>>()
         };
@@ -161,20 +165,24 @@ impl deboa::conn::HttpConnectionPool for HttpConnectionPool {
             }));
         };
 
-        let connection = tokio::time::timeout(
-            config.connection_timeout(),
-            ConnectionFactory::create_connection(config, ip),
-        )
-        .await
-        .map_err(|_| {
-            DeboaError::Connection(ConnectionError::Timeout {
+        // TODO: DnsResponse has ALPN entries, I mean, it is returning supported HTTP version, so update config with the preferred one.
+        // ----
+        // TODO: If DnsResponse has no entries, go ahead without any config change, which means, use HTTP/1.1
+        // ----
+        // TODO: Handle custom secure connection implementations
+        let res =
+            tokio::time::timeout(config.connection_timeout(), create_connection(ip, config)).await;
+
+        let connection = match res {
+            Ok(e) => e,
+            Err(_) => Err(DeboaError::Connection(ConnectionError::Timeout {
                 message: format!(
                     "Connection to {} timed out after {:?}",
                     key,
                     config.connection_timeout()
                 ),
-            })
-        })??;
+            })),
+        }?;
 
         self.connections
             .insert(key.clone(), connection);

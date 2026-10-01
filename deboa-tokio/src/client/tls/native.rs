@@ -1,11 +1,17 @@
 //! TLS implementation using native-tls
 //!
-use crate::cert::{DeboaCertificate, DeboaIdentity};
-use async_native_tls::{Certificate, Identity, TlsConnector, TlsStream};
+use crate::{
+    cert::{DeboaCertificate, DeboaIdentity},
+    client::http::conn::plain_stream_connect,
+    rt::stream::TokioStream,
+};
+use async_native_tls_ext::{Certificate, Identity, TlsConnector, TlsStream};
 use deboa::{
+    conn::ConnectionConfig,
     errors::{ConnectionError, DeboaError},
     Result,
 };
+use std::net::IpAddr;
 use tokio::net::TcpStream;
 
 /// Builder for TLS connections using native-tls
@@ -112,32 +118,17 @@ impl<'a> TlsConnectionBuilder<'a> {
     }
 }
 
-async fn connect_with_nativetls<'a>(
-    tcp_stream: TcpStream,
+pub async fn connect<'a>(
+    ip: IpAddr,
     config: &ConnectionConfig<'a, DeboaIdentity, DeboaCertificate>,
 ) -> Result<TokioStream> {
-    use crate::client::tls::native::TlsConnectionBuilder;
+    let tcp_stream = plain_stream_connect(&ip, config.port()).await?;
+
     let stream = TlsConnectionBuilder::new(tcp_stream, config.host())
         .certificate(config.certificate())
         .identity(config.identity())
         .connect()
         .await?;
 
-    if let Some(alpn) = stream
-        .get_ref()
-        .alpn_protocol()
-    {
-        let Cow::Borrowed(alpn_code) = String::from_utf8_lossy(alpn) else {
-            return Err(DeboaError::Connection(ConnectionError::Tcp {
-                message: "Invalid ALPN code".to_string(),
-            }));
-        };
-
-        let version: Version = deboa::Alpn::new(alpn_code).into();
-        info!("ALPN info found, switching connection to {:?}", version);
-        Ok(TokioStream::Tls(stream))
-    } else {
-        info!("No ALPN info available, falling back to HTTP/1.1");
-        Ok(TokioStream::Tls(stream))
-    }
+    Ok(TokioStream::Tls(stream))
 }

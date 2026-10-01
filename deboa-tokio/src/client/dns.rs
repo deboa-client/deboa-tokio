@@ -3,7 +3,7 @@
 //! This module provides DNS resolution functionality for the Deboa HTTP client.
 
 use deboa::{
-    dns::DnsResolver,
+    dns::{DnsResolver, DnsResponse},
     errors::{DeboaError::Dns, DnsError},
 };
 use rand::seq::SliceRandom;
@@ -15,7 +15,7 @@ use tokio::net::lookup_host;
 pub struct DefaultDnsResolver;
 
 impl DnsResolver for DefaultDnsResolver {
-    async fn resolve(&self, host: String, port: u16) -> deboa::Result<Vec<IpAddr>> {
+    async fn resolve(&self, host: String, port: u16) -> deboa::Result<DnsResponse> {
         let hostname = format!("{}:{}", host, port);
         let addrs = lookup_host(hostname).await;
         if let Err(e) = addrs {
@@ -27,6 +27,9 @@ impl DnsResolver for DefaultDnsResolver {
             .map(|addr| addr.ip())
             .collect();
         ips.shuffle(&mut rand::rng());
-        Ok(ips)
+
+        Ok(DnsResponse::builder()
+            .addresses(ips)
+            .build())
     }
 }

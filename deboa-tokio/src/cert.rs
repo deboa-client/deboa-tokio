@@ -6,7 +6,7 @@
 //! It also provides the `Certificate` struct for working with CA certificates.
 
 #[cfg(feature = "native-tls")]
-use async_native_tls::{Certificate as NativeCertificate, Identity as NativeIdentity};
+use async_native_tls_ext::{Certificate as NativeCertificate, Identity as NativeIdentity};
 #[cfg(feature = "native-tls")]
 use deboa::cert::IdentityNativeExt;
 use deboa::cert::{Certificate as _, CertificateExt, ContentEncoding, IdentityExt};

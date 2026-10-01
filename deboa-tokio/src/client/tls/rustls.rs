@@ -1,37 +1,14 @@
 //! TLS implementation using rustls
-
-use std::{borrow::Cow, net::IpAddr, sync::Arc};
-
-use crate::{
-    cert::{DeboaCertificate, DeboaIdentity},
-    client::http::conn::TcpStreamFactory,
-};
+use crate::cert::{DeboaCertificate, DeboaIdentity};
 use deboa::{
-    conn::ConnectionConfig,
     errors::{ConnectionError, DeboaError},
     Result,
 };
-use http::Version;
-use log::info;
 use rustls::{
     pki_types::{CertificateDer, PrivateKeyDer},
     ClientConfig,
 };
-use tokio::net::TcpStream;
-use tokio_rustls::client::TlsStream;
-
-pub(crate) struct RustlsStreamFactory {}
-
-impl RustlsStreamFactory {
-    pub async fn connect<'a>(
-        ip: &IpAddr,
-        port: u16,
-        config: &'a ConnectionConfig<'a, DeboaIdentity, DeboaCertificate>,
-    ) -> Result<TlsStream<TcpStream>> {
-        let tcp_stream = TcpStreamFactory::connect(ip, port).await?;
-        connect_with_rustls(tcp_stream, config).await
-    }
-}
+use std::sync::Arc;
 
 /// Builder for TLS connections using rustls
 pub struct TlsConnectionBuilder<'a> {
@@ -53,13 +30,13 @@ impl Default for TlsConnectionBuilder<'_> {
 }
 
 impl<'a> TlsConnectionBuilder<'a> {
-    /// Set the identity to use for the connection
+    /// Set identity to use with connection
     pub fn identity(mut self, identity: Option<&'a DeboaIdentity>) -> Self {
         self.identity = identity;
         self
     }
 
-    /// Set the certificate to use for the connection
+    /// Set certificate to use with connection
     pub fn certificate(mut self, certificate: Option<&'a DeboaCertificate>) -> Self {
         self.certificate = certificate;
         self
@@ -71,7 +48,7 @@ impl<'a> TlsConnectionBuilder<'a> {
         self
     }
 
-    /// Set the ALPN protocols to use for the connection
+    /// Set the ALPN protocols this client has support to
     pub fn alpn(mut self, alpn: Vec<Vec<u8>>) -> Self {
         self.alpn = alpn;
         self
@@ -168,93 +145,90 @@ impl<'a> TlsConnectionBuilder<'a> {
     }
 }
 
-/// Create a TlsStream out of TcpStream
-pub async fn connect_with_rustls<'a>(
-    tcp_stream: TcpStream,
-    config: &ConnectionConfig<'a, DeboaIdentity, DeboaCertificate>,
-) -> Result<TlsStream<TcpStream>> {
-    use crate::client::tls::rustls::{tcp::connect, TlsConnectionBuilder};
-    let tls_config = TlsConnectionBuilder::default()
-        .certificate(config.certificate())
-        .identity(config.identity())
-        .build_config()?;
-
-    let stream = connect(tls_config, tcp_stream, config.host()).await?;
-
-    if let Some(alpn) = stream
-        .get_ref()
-        .1
-        .alpn_protocol()
-    {
-        let Cow::Borrowed(alpn_code) = String::from_utf8_lossy(alpn) else {
-            return Err(DeboaError::Connection(ConnectionError::Tcp {
-                message: "Invalid ALPN code".to_string(),
-            }));
-        };
-
-        let version: Version = deboa::Alpn::new(alpn_code).into();
-        info!("ALPN info found, switching connection to {:?}", version);
-        Ok(stream)
-    } else {
-        info!("No ALPN info available, falling back to HTTP/1.1");
-        Ok(stream)
-    }
-}
-
 /// TCP connection module for TLS
 pub mod tcp {
+    use crate::{
+        cert::{DeboaCertificate, DeboaIdentity},
+        client::{http::conn::plain_stream_connect, tls::rustls::TlsConnectionBuilder},
+        rt::stream::TokioStream,
+    };
     use deboa::{
+        conn::ConnectionConfig,
         errors::{ConnectionError, DeboaError},
         Result,
     };
-    use rustls::ClientConfig;
     use rustls_pki_types::ServerName;
-    use std::sync::Arc;
-    use tokio::net::TcpStream;
-    use tokio_rustls::{client::TlsStream, TlsConnector};
+    use std::{net::IpAddr, sync::Arc};
+    use tokio_rustls::TlsConnector;
 
-    /// Establish a TLS connection over TCP
-    pub async fn connect(
-        config: ClientConfig,
-        inner_stream: TcpStream,
-        host: &str,
-    ) -> Result<TlsStream<TcpStream>> {
-        let connector = TlsConnector::from(Arc::new(config));
+    /// Connect to a TCP TLS stream
+    pub async fn connect<'a>(
+        ip: &IpAddr,
+        config: &'a ConnectionConfig<'a, DeboaIdentity, DeboaCertificate>,
+    ) -> Result<TokioStream> {
+        let tcp_stream = plain_stream_connect(ip, config.port()).await?;
 
-        let hostname = ServerName::try_from(host.to_string())
-            .map_err(|e| DeboaError::Connection(ConnectionError::Tls { message: e.to_string() }))?;
+        let tls_config = TlsConnectionBuilder::default()
+            .certificate(config.certificate())
+            .identity(config.identity())
+            .build_config()?;
 
-        connector
-            .connect(hostname, inner_stream)
+        let connector = TlsConnector::from(Arc::new(tls_config));
+
+        let hostname = ServerName::try_from(
+            config
+                .host()
+                .to_string(),
+        )
+        .map_err(|e| DeboaError::Connection(ConnectionError::Tls { message: e.to_string() }))?;
+
+        let tls_stream = connector
+            .connect(hostname, tcp_stream)
             .await
             .map_err(|e| {
                 DeboaError::Connection(ConnectionError::Tls {
                     message: format!("Could not connect to server: {}", e),
                 })
-            })
+            })?;
+
+        Ok(TokioStream::Tls(Box::new(tls_stream)))
     }
 }
 
 #[cfg(feature = "http3")]
 /// UDP connection module for TLS
 pub mod udp {
+    use crate::{
+        cert::{DeboaCertificate, DeboaIdentity},
+        client::tls::rustls::TlsConnectionBuilder,
+    };
     use deboa::{
+        conn::ConnectionConfig,
         errors::{ConnectionError, DeboaError},
         Result,
     };
     use h3_quinn::Connection;
-    use quinn::{crypto::rustls::QuicClientConfig, Endpoint};
-    use rustls::ClientConfig;
-    use std::{net::SocketAddr, sync::Arc};
+    use quinn::crypto::rustls::QuicClientConfig;
+    use quinn::Endpoint;
+    use std::{
+        net::{IpAddr, SocketAddr},
+        sync::Arc,
+    };
 
-    /// Establish a TLS connection over UDP
-    pub async fn connect(
-        config: ClientConfig,
-        endpoint: &mut Endpoint,
-        socket_addr: SocketAddr,
-        host: &str,
+    /// Connect to a Quic TLS stream
+    pub async fn connect<'a>(
+        ip: &IpAddr,
+        config: &'a ConnectionConfig<'a, DeboaIdentity, DeboaCertificate>,
     ) -> Result<Connection> {
-        let quic_config = QuicClientConfig::try_from(config).map_err(|e| {
+        let mut endpoint = Endpoint::client(SocketAddr::new(*config.client_bind_addr(), 0))
+            .map_err(|e| DeboaError::Connection(ConnectionError::Udp { message: e.to_string() }))?;
+
+        let tls_config = TlsConnectionBuilder::default()
+            .certificate(config.certificate())
+            .identity(config.identity())
+            .build_config()?;
+
+        let quic_config = QuicClientConfig::try_from(tls_config).map_err(|e| {
             DeboaError::Connection(ConnectionError::Tls {
                 message: format!("Could not create QUIC client config: {}", e),
             })
@@ -264,7 +238,7 @@ pub mod udp {
         endpoint.set_default_client_config(client_config);
 
         let conn = endpoint
-            .connect(socket_addr, host)
+            .connect(SocketAddr::new(*ip, config.port()), config.host())
             .map_err(|e| {
                 DeboaError::Connection(ConnectionError::Udp {
                     message: format!("Could not connect to server: {}", e),
