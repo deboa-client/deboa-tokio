@@ -47,8 +47,8 @@ Or add to your `Cargo.toml`:
 
 ```toml
 deboa = { version = "0.1.4" }
-deboa-tokio = { version = "0.1.1" }
-http = "1.3.1"
+deboa-tokio = { version = "0.1.3" }
+http = "1.5.0"
 ```
 
 ## Crate features
