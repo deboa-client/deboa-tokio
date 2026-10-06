@@ -1,3 +1,4 @@
 [submodule "deboa-test-utils"]
 	path = deboa-test-utils
 	url = ../deboa-test-utils.git
+	branch = main
