@@ -19,13 +19,14 @@ async-executor = { version = "1.13.3", default-features = false }
 async-lock = "3.4.2"
 base64 = { version = "0.23.1" }
 bytes = { version = "1.11" }
-caramelo = "0.1.4"
+caramelo = "0.1.5"
 cookie = { version = "0.18.1" }
 deboa = { path = "../deboa/deboa" }
 #deboa = { version = "0.1.5-beta.2" }
 deboa-extras = { path = "../deboa-contrib/deboa-extras" }
 #deboa-extras = { version = "0.1.1-beta.2" }
 deboa-fory = { path = "../deboa-contrib/deboa-fory" }
+#deboa-fory = { version = "0.1.8-beta.2" }
 deboa-macros = { path = "../deboa/deboa-macros" }
 #deboa-macros = { version = "0.1.0-beta.7" }
 deboa-test-utils = { path = "deboa-test-utils" }
@@ -34,8 +35,9 @@ futures-util = { version = "0.3.31", default-features = false }
 hashbrown = "0.17.1"
 http = "1"
 http-body-util = "0.1"
-hyper = { version = "1.8.1", features = ["client"], default-features = false }
-hyper-body-utils = { version = "0.1.17", default-features = false }
+hyper = { version = "1.11.1", features = ["client"], default-features = false }
+hyper-body-utils = { path = "../hyper-body-utils", default-features = false }
+#hyper-body-utils = { version = "0.1.17", default-features = false }
 hyper-util = { version = "0.1.20", features = [
   "client",
   "client-legacy",

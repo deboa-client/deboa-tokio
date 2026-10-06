@@ -107,10 +107,7 @@ impl DeboaConnection {
                     })?
                     .into_parts();
 
-                Ok(DeboaResponse::new(http::Response::from_parts(
-                    parts,
-                    HttpBody::from_incoming(body),
-                )))
+                Ok(DeboaResponse::new(http::Response::from_parts(parts, HttpBody::incoming(body))))
             }
             #[cfg(feature = "http2")]
             DeboaConnection::Http2(ref mut conn) => {
@@ -123,10 +120,7 @@ impl DeboaConnection {
                     })?
                     .into_parts();
 
-                Ok(DeboaResponse::new(http::Response::from_parts(
-                    parts,
-                    HttpBody::from_incoming(body),
-                )))
+                Ok(DeboaResponse::new(http::Response::from_parts(parts, HttpBody::incoming(body))))
             }
             #[cfg(feature = "http3")]
             DeboaConnection::Http3(ref mut conn) => {
