@@ -1,5 +1,4 @@
 //! TLS implementation using native-tls
-//!
 use crate::{
     cert::{DeboaCertificate, DeboaIdentity},
     client::http::conn::plain_stream_connect,

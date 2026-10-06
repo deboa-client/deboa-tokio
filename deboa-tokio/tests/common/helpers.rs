@@ -6,8 +6,11 @@ use deboa_test_utils::common::helpers::CA_CERT;
 use deboa_test_utils::common::helpers::{SERVER_CERT, SERVER_KEY};
 #[cfg(any(feature = "rust-tls", feature = "native-tls"))]
 use deboa_tokio::{cert::DeboaCertificate, Client};
-use easyhttpmock_vetis_tokio::{config::EasyHttpMockConfig, vetis_adapter::VetisAdapterConfig};
-use easyhttpmock_vetis_tokio::{vetis_adapter::VetisAdapter, EasyHttpMock};
+use easyhttpmock_vetis_tokio::{
+    config::EasyHttpMockConfig,
+    vetis_adapter::{VetisAdapter, VetisAdapterConfig},
+    EasyHttpMock,
+};
 use http::Version;
 use rstest::fixture;
 #[cfg(any(feature = "rust-tls", feature = "native-tls"))]
@@ -79,7 +82,6 @@ pub async fn tls_mock_server() -> EasyHttpMock<VetisAdapter> {
                 .unwrap(),
         )
         .protos(vec![protocol_version()])
-        .port(free_port(&interface))
         .cert(server_cert.to_vec())
         .key(server_key.to_vec())
         .ca(CA_CERT.to_vec())
@@ -113,7 +115,6 @@ pub async fn plain_mock_server() -> EasyHttpMock<VetisAdapter> {
                 .unwrap(),
         )
         .protocol_version(protocol_version())
-        .port(free_port(&interface))
         .build();
 
     let config = EasyHttpMockConfig::<VetisAdapter>::builder()
@@ -137,13 +138,4 @@ pub async fn create_server() -> EasyHttpMock<VetisAdapter> {
     return tls_mock_server().await;
     #[cfg(not(any(feature = "rust-tls", feature = "native-tls")))]
     return plain_mock_server().await;
-}
-
-fn free_port(interface: &str) -> u16 {
-    let listener = std::net::TcpListener::bind((interface, 0))
-        .expect("bind an ephemeral port to ask the OS for a free one");
-    listener
-        .local_addr()
-        .expect("read back the bound port")
-        .port()
 }

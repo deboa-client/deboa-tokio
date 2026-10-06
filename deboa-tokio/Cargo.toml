@@ -63,7 +63,7 @@ native-tls = ["async-native-tls-ext/runtime-tokio"]
 # protocols
 http2 = ["hyper/http2", "hyper-util/http2"]
 http3 = [
-  "deboa-h3/generic",
+  "dep:deboa-h3",
   "dep:futures",
   "dep:h3",
   "dep:h3-quinn",

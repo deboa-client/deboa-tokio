@@ -229,7 +229,7 @@ pub async fn create_plain_connection<'a>(
 
 // TODO: NativeTls is the açternative SecureConnection implementation which can be provided to client
 #[cfg(feature = "native-tls")]
-/// Create a new connection.
+/// Create a new connection..into()
 pub async fn create_secure_connection<'a>(
     ip: &IpAddr,
     config: &'a ConnectionConfig<'a, DeboaIdentity, DeboaCertificate>,
