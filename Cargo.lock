@@ -831,7 +831,7 @@ dependencies = [
  "deboa-extras 0.1.1-beta.2",
  "deboa-fory",
  "deboa-macros",
- "easyhttpmock 0.1.5-beta.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "easyhttpmock",
  "env_logger",
  "fory",
  "fory-core",
@@ -1007,33 +1007,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "easyhttpmock"
-version = "0.1.5-beta.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea7c61cd9859caf9844c5ccc1cb2416654e1235c4932647922b6d022cea7f51b"
-dependencies = [
- "bytes",
- "caramelo",
- "http",
- "jsonpath-rust",
- "once_cell",
- "rand",
- "regex",
- "serde",
- "serde-xml-rs",
- "serde_json",
- "simdxml",
- "sonic-number",
- "sonic-rs",
- "thiserror 2.0.21",
-]
-
-[[package]]
 name = "easyhttpmock-vetis-tokio"
 version = "0.1.2-beta.2"
 dependencies = [
  "caramelo",
- "easyhttpmock 0.1.5-beta.2",
+ "easyhttpmock",
  "http",
  "http-body-util",
  "rand",
