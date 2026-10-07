@@ -37,7 +37,7 @@ use deboa_h3::generic::Http3Request;
 use http::{Request, Version};
 use hyper_body_utils::HttpBody;
 use std::{error::Error, marker::PhantomData, net::IpAddr, time::Duration};
-use tokio::net::TcpStream;
+use tokio::{net::TcpStream, task::JoinHandle};
 
 /// Connection pooling for efficient HTTP connections.
 ///
@@ -173,13 +173,14 @@ impl HttpConnectionDispatcher for DeboaConnection {
 /// * `sender` - The sender to use.
 pub struct BaseHttpConnection<Sender, ReqBody, ResBody> {
     pub(crate) sender: Sender,
+    pub(crate) handle: JoinHandle<Result<()>>,
     pub(crate) req_body: PhantomData<ReqBody>,
     pub(crate) res_body: PhantomData<ResBody>,
 }
 
 impl<Sender, ReqBody, ResBody> BaseHttpConnection<Sender, ReqBody, ResBody> {
-    pub(crate) fn new(sender: Sender) -> Self {
-        Self { sender, req_body: PhantomData, res_body: PhantomData }
+    pub(crate) fn new(sender: Sender, handle: JoinHandle<Result<()>>) -> Self {
+        Self { sender, handle, req_body: PhantomData, res_body: PhantomData }
     }
 }
 

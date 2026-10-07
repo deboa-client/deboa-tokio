@@ -35,16 +35,14 @@ impl ProtoConnection for Http1Connection {
                 DeboaError::Connection(ConnectionError::Handshake { message: e.to_string() })
             })?;
 
-        tokio::spawn(async move {
-            match conn
-                .with_upgrades()
+        let handle = tokio::spawn(async move {
+            conn.with_upgrades()
                 .await
-            {
-                Ok(_) => (),
-                Err(_err) => {}
-            };
+                .map_err(|e| {
+                    DeboaError::Connection(ConnectionError::Tcp { message: e.to_string() })
+                })
         });
 
-        Ok(BaseHttpConnection::new(sender))
+        Ok(BaseHttpConnection::new(sender, handle))
     }
 }
