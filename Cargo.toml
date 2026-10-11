@@ -15,28 +15,15 @@ license = "MIT OR Apache-2.0"
 rust-version = "1.85.0"
 
 [workspace.dependencies]
-#deboa = { version = "0.1.5-beta.2" }
-#deboa-extras = { version = "0.1.1-beta.2" }
-#deboa-fory = { version = "0.1.8-beta.2" }
-#deboa-macros = { version = "0.1.0-beta.7" }
-#deboa-tokio = { version = "0.1.0-beta.7" }
-#vamo = { version = "0.1.2-beta.2" }
-#vamo-macros = { version = "0.1.2-beta.2" }
-
-deboa = { git = "https://github.com/deboa-client/deboa.git" }
-deboa-extras = { git = "https://github.com/deboa-client/deboa-contrib.git" }
-deboa-fory = { git = "https://github.com/deboa-client/deboa-contrib.git" }
-deboa-macros = { git = "https://github.com/deboa-client/deboa.git" }
-vamo = { git = "https://github.com/deboa-client/vamo.git" }
-vamo-macros = { git = "https://github.com/deboa-client/vamo.git" }
-
 async-executor = { version = "1.13.3", default-features = false }
 async-lock = "3.4.2"
 base64 = { version = "0.23.1" }
 bytes = { version = "1.11" }
 caramelo = "0.1.5"
 cookie = { version = "0.18.1" }
+deboa = { version = "0.1.5-beta.3" }
 deboa-test-utils = { path = "deboa-test-utils" }
+deboa-tokio = { version = "0.1.0-beta.7" }
 env_logger = "0.11.11"
 futures-util = { version = "0.3.31", default-features = false }
 hashbrown = "0.17.1"
