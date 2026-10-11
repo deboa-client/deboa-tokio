@@ -7,8 +7,21 @@ rustflags = ["-C", "target-cpu=generic"]
 [target.x86_64-unknown-linux-musl]
 rustflags = ["-C", "target-cpu=generic"]
 
+[target.aarch64-apple-darwin]
+rustflags = ["-C", "target-cpu=apple-m1"]
+
 [target.x86_64-pc-windows-gnu]
 rustflags = ["-C", "target-cpu=x86-64-v2"]
 
 [target.x86_64-pc-windows-msvc]
 rustflags = ["-C", "target-cpu=generic"]
+
+paths = [
+    "../deboa/deboa",
+    "../deboa-contrib/deboa-extras",
+    "../deboa-contrib/deboa-fory",
+    "../deboa/deboa-macros",
+    "../hyper-body-utils",
+    "../vamo/vamo",
+    "../vamo/vamo-macros",
+]
