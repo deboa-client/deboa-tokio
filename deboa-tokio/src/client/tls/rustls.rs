@@ -1,12 +1,12 @@
 //! TLS implementation using rustls
 use crate::cert::{DeboaCertificate, DeboaIdentity};
 use deboa::{
-    errors::{ConnectionError, DeboaError},
     Result,
+    errors::{ConnectionError, DeboaError},
 };
 use rustls::{
-    pki_types::{CertificateDer, PrivateKeyDer},
     ClientConfig,
+    pki_types::{CertificateDer, PrivateKeyDer},
 };
 use std::sync::Arc;
 
@@ -153,9 +153,9 @@ pub mod tcp {
         rt::stream::TokioStream,
     };
     use deboa::{
+        Result,
         conn::ConnectionConfig,
         errors::{ConnectionError, DeboaError},
-        Result,
     };
     use rustls_pki_types::ServerName;
     use std::{net::IpAddr, sync::Arc};
@@ -203,13 +203,13 @@ pub mod udp {
         client::tls::rustls::TlsConnectionBuilder,
     };
     use deboa::{
+        Result,
         conn::ConnectionConfig,
         errors::{ConnectionError, DeboaError},
-        Result,
     };
     use h3_quinn::Connection;
-    use quinn::crypto::rustls::QuicClientConfig;
     use quinn::Endpoint;
+    use quinn::crypto::rustls::QuicClientConfig;
     use std::{
         net::{IpAddr, SocketAddr},
         sync::Arc,

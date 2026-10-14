@@ -6,9 +6,9 @@ use crate::{
 };
 use async_native_tls_ext::{Certificate, Identity, TlsConnector, TlsStream};
 use deboa::{
+    Result,
     conn::ConnectionConfig,
     errors::{ConnectionError, DeboaError},
-    Result,
 };
 use std::net::IpAddr;
 use tokio::net::TcpStream;

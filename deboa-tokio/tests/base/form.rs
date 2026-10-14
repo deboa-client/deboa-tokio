@@ -1,6 +1,6 @@
 use deboa::TestResult;
 use deboa_tokio::Client;
-use easyhttpmock_vetis_tokio::{vetis_adapter::VetisAdapter, EasyHttpMock};
+use easyhttpmock_vetis_tokio::{EasyHttpMock, vetis_adapter::VetisAdapter};
 use rstest::rstest;
 
 use crate::common::helpers::{create_client, create_server, protocol_version};

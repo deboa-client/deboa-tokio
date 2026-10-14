@@ -5,11 +5,11 @@ use deboa_test_utils::common::helpers::CA_CERT;
 #[cfg(any(feature = "rust-tls", feature = "native-tls"))]
 use deboa_test_utils::common::helpers::{SERVER_CERT, SERVER_KEY};
 #[cfg(any(feature = "rust-tls", feature = "native-tls"))]
-use deboa_tokio::{cert::DeboaCertificate, Client};
+use deboa_tokio::{Client, cert::DeboaCertificate};
 use easyhttpmock_vetis_tokio::{
+    EasyHttpMock,
     config::EasyHttpMockConfig,
     vetis_adapter::{VetisAdapter, VetisAdapterConfig},
-    EasyHttpMock,
 };
 use http::Version;
 use rstest::fixture;
