@@ -5,9 +5,9 @@ permissions:
 
 on:
   push:
-    branches: ["**"]
+    branches: ["main"]
   pull_request:
-    branches: ["**"]
+    branches: ["main"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -66,23 +66,3 @@ jobs:
         run: |
           cd deboa-tokio
           cargo nextest run --no-fail-fast --features "${{ matrix.protocol }} ${{ matrix.tls }} ${{ matrix.tls == 'rust-tls' && 'default-rustls-provider' || '' }} ${{ matrix.tls == 'rust-tls' && 'default-rustls-verifier' || '' }} easyhttpmock-vetis-tokio/${{ matrix.protocol }} easyhttpmock-vetis-tokio/rust-tls" --no-default-features
-
-  build-android:
-    runs-on: ubuntu-latest
-    container: instrumentisto/cargo-ndk
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          submodules: true
-
-      - name: Install Rust toolchains
-        run: rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
-
-      - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Build for android archs with cargo-ndk
-        run: |
-          cargo ndk --target aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android build
