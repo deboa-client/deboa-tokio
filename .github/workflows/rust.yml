@@ -64,5 +64,4 @@ jobs:
       - name: Run deboa-tokio tests on ${{ matrix.os }} with ${{ matrix.protocol }} using ${{ matrix.tls }}
         if: (matrix.os != 'windows-latest' && matrix.tls != 'native-tls') || (matrix.os != 'macos-latest' && matrix.tls != 'native-tls')
         run: |
-          cd deboa-tokio
           cargo nextest run --no-fail-fast --features "${{ matrix.protocol }} ${{ matrix.tls }} ${{ matrix.tls == 'rust-tls' && 'default-rustls-provider' || '' }} ${{ matrix.tls == 'rust-tls' && 'default-rustls-verifier' || '' }} easyhttpmock-vetis-tokio/${{ matrix.protocol }} easyhttpmock-vetis-tokio/rust-tls" --no-default-features
