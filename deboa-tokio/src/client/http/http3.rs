@@ -1,8 +1,8 @@
 use crate::client::http::conn::{BaseHttpConnection, Http3Connection};
 use deboa::{
+    Result,
     conn::{HttpConnection, ProtoConnection},
     errors::{ConnectionError, DeboaError},
-    Result,
 };
 use deboa_h3::generic::{Http3Request, SendRequest};
 use futures::future;

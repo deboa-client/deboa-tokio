@@ -3,10 +3,10 @@ use crate::{
     rt::stream::TokioStream,
 };
 use deboa::{
+    Result,
     conn::{HttpConnection, ProtoConnection},
     errors::{ConnectionError, DeboaError},
     request::Http2Request,
-    Result,
 };
 use http::version::Version;
 use hyper::client::conn::http2::handshake;

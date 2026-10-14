@@ -1,7 +1,7 @@
 use crate::common::helpers::{create_client, create_server, protocol_version};
 use deboa::TestResult;
 use deboa_tokio::Client;
-use easyhttpmock_vetis_tokio::{vetis_adapter::VetisAdapter, EasyHttpMock};
+use easyhttpmock_vetis_tokio::{EasyHttpMock, vetis_adapter::VetisAdapter};
 use rstest::*;
 
 #[rstest]
@@ -12,5 +12,5 @@ async fn test_patch(
     protocol_version: http::Version,
 ) -> TestResult<()> {
     let mut server = create_server.await;
-    deboa_test_utils::base::patch::test_patch(create_client, &mut server, protocol_version).await
+    deboa_test_utils::base::patch::test_patch(&create_client, &mut server, protocol_version).await
 }

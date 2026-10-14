@@ -1,11 +1,11 @@
 use crate::{
     cert::{DeboaCertificate, DeboaIdentity},
-    client::http::conn::{create_connection, ConnectionConfig, DeboaConnection},
+    client::http::conn::{ConnectionConfig, DeboaConnection, create_connection},
 };
 use deboa::{
+    Result,
     dns::DnsResolver,
     errors::{ConnectionError, DeboaError, RequestError},
-    Result,
 };
 use hashbrown::HashMap;
 use std::time::Duration;

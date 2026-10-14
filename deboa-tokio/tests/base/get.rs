@@ -1,17 +1,17 @@
 #![allow(unused_variables)]
 use crate::common::helpers::{create_client, create_server, protocol_version};
+use deboa::TestResult;
 #[cfg(feature = "rust-tls")]
 use deboa::cert::IdentityExt as _;
 #[cfg(feature = "native-tls")]
 use deboa::cert::IdentityNativeExt as _;
 #[cfg(any(feature = "rust-tls", feature = "native-tls"))]
 use deboa::cert::{CertificateExt as _, ContentEncoding};
-use deboa::TestResult;
 use deboa_tokio::{
-    cert::{DeboaCertificate, DeboaIdentity},
     Client,
+    cert::{DeboaCertificate, DeboaIdentity},
 };
-use easyhttpmock_vetis_tokio::{vetis_adapter::VetisAdapter, EasyHttpMock};
+use easyhttpmock_vetis_tokio::{EasyHttpMock, vetis_adapter::VetisAdapter};
 use rstest::*;
 
 #[rstest]
