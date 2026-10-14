@@ -5,13 +5,13 @@
 //!
 //! # Architecture
 //!
-//! - [`http`]: Core HTTP protocol implementations (HTTP/1.1, HTTP/2)
+//! - [`http`]: Core HTTP protocol implementations (HTTP/1.1, HTTP/2 and HTTP/3)
 //! - [`pool`]: Connection pooling for efficient request handling
 //!
 //! # Features
 //!
 //! - Automatic connection pooling
-//! - Protocol negotiation (HTTP/1.1, HTTP/2)
+//! - Protocol negotiation (HTTP/1.1, HTTP/2 and HTTP/3)
 //! - Connection lifecycle management
 //! - Thread-safe connection handling
 //! ```
@@ -36,7 +36,7 @@ use deboa::{
 use deboa_h3::generic::Http3Request;
 use http::{Request, Version};
 use hyper_body_utils::HttpBody;
-use std::{error::Error, marker::PhantomData, net::IpAddr, time::Duration};
+use std::{marker::PhantomData, net::IpAddr, time::Duration};
 use tokio::{net::TcpStream, task::JoinHandle};
 
 /// Connection pooling for efficient HTTP connections.
@@ -102,7 +102,6 @@ impl DeboaConnection {
                     .send_request(request)
                     .await
                     .map_err(|e| {
-                        println!("Error: {:?}", e.source());
                         DeboaError::Request(RequestError::Send { message: e.to_string() })
                     })?
                     .into_parts();
@@ -197,7 +196,6 @@ async fn create_connection<'a>(
     }
 }
 
-// TODO: For now leave here, as I don't have plans to make more reusable than this
 pub(crate) async fn plain_stream_connect<'a>(ip: &IpAddr, port: u16) -> Result<TcpStream> {
     let stream = TcpStream::connect(format!("{}:{}", ip, port))
         .await
@@ -228,7 +226,6 @@ pub async fn create_plain_connection<'a>(
     Ok(conn)
 }
 
-// TODO: NativeTls is the açternative SecureConnection implementation which can be provided to client
 #[cfg(feature = "native-tls")]
 /// Create a new connection..into()
 pub async fn create_secure_connection<'a>(
@@ -237,7 +234,6 @@ pub async fn create_secure_connection<'a>(
 ) -> Result<DeboaConnection> {
     let tls_stream = tls::native::connect(*ip, config).await?;
     let conn = if !config.prior_knowledge() {
-        // TODO: Restore Native TLS support
         DeboaConnection::http1(Http1Connection::connect(tls_stream).await?)
     } else {
         match *config.protocol_version() {
@@ -253,7 +249,6 @@ pub async fn create_secure_connection<'a>(
     Ok(conn)
 }
 
-// TODO: Rustls is the default SecureConnection implementation, but no ALPN handling
 #[cfg(feature = "rust-tls")]
 /// Create a new connection.
 pub async fn create_secure_connection<'a>(
