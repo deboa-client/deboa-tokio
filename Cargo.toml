@@ -19,7 +19,7 @@ base64 = { version = "0.23.1" }
 bytes = { version = "1.11" }
 caramelo = "0.1.5"
 cookie = { version = "0.18.1" }
-deboa = { version = "0.1.5-beta.4" }
+deboa = { version = "0.1.5-beta.5" }
 deboa-test-utils = { path = "deboa-test-utils" }
 env_logger = "0.11.11"
 futures-util = { version = "0.3.31", default-features = false }
