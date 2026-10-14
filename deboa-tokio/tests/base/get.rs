@@ -151,7 +151,7 @@ async fn test_get_invalid_server(
     #[future] create_server: EasyHttpMock<VetisAdapter>,
     protocol_version: http::Version,
 ) -> TestResult<()> {
-    deboa_test_utils::base::get::test_get_invalid_server(&create_client).await
+    deboa_test_utils::base::get::test_get_invalid_server(&create_client, protocol_version).await
 }
 
 #[rstest]
@@ -176,7 +176,12 @@ async fn test_try_into(
     #[future] create_server: EasyHttpMock<VetisAdapter>,
     protocol_version: http::Version,
 ) -> TestResult<()> {
-    deboa_test_utils::base::get::test_try_into(&create_client, &mut create_server.await).await
+    deboa_test_utils::base::get::test_try_into(
+        &create_client,
+        &mut create_server.await,
+        protocol_version,
+    )
+    .await
 }
 
 #[rstest]
@@ -186,5 +191,10 @@ async fn test_fetch_from_str(
     #[future] create_server: EasyHttpMock<VetisAdapter>,
     protocol_version: http::Version,
 ) -> TestResult<()> {
-    deboa_test_utils::base::get::test_fetch_from_str(&create_client, &mut create_server.await).await
+    deboa_test_utils::base::get::test_fetch_from_str(
+        &create_client,
+        &mut create_server.await,
+        protocol_version,
+    )
+    .await
 }
