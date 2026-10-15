@@ -113,7 +113,7 @@ webpki-roots = { version = "1.0.6", optional = true, default-features = false }
 [dev-dependencies]
 caramelo.workspace = true
 deboa-test-utils = { workspace = true }
-easyhttpmock-vetis-tokio = { version = "0.1.2-beta.4", features = [
+easyhttpmock-vetis-tokio = { version = "0.1.2-beta.5", features = [
   #"http2",
   "http3",
   "rust-tls",
