@@ -308,32 +308,6 @@ checksum = "460fbee9c2c2f33933d720630a6a0bac33ba7053db5344fac858d4b8952d77d5"
 [[package]]
 name = "deboa"
 version = "0.1.5-beta.5"
-dependencies = [
- "async-fn-stream",
- "async-lock",
- "base64",
- "bytes",
- "cookie",
- "futures",
- "hashbrown 0.17.1",
- "http",
- "http-body",
- "http-body-util",
- "hyper",
- "hyper-body-utils",
- "log",
- "rand",
- "regex",
- "serde",
- "tackle",
- "thiserror 2.0.21",
- "url",
- "urlencoding",
-]
-
-[[package]]
-name = "deboa"
-version = "0.1.5-beta.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "395f954c4cfd84d010b7dc7d02ea67f24dd0af799f231c0c0a0ec293520fec46"
 dependencies = [
@@ -366,7 +340,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "65b0668a05f777caaff0748299b342cbb7ef93e0fc1d3de3f3aadf2938a7bcf3"
 dependencies = [
  "bytes",
- "deboa 0.1.5-beta.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "deboa",
  "h3",
  "h3-quinn",
  "http",
@@ -380,7 +354,7 @@ version = "0.1.0"
 dependencies = [
  "caramelo",
  "ciborium",
- "deboa 0.1.5-beta.5",
+ "deboa",
  "easyhttpmock",
  "fory",
  "http",
@@ -398,7 +372,7 @@ version = "0.1.0-beta.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7888362295e39f4965bcbb863e864d6b9e21501ae4851477bcc65df048a82910"
 dependencies = [
- "deboa 0.1.5-beta.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "deboa",
  "futures-io",
  "futures-rustls",
  "rustls",
@@ -413,7 +387,7 @@ version = "0.1.4-beta.5"
 dependencies = [
  "async-native-tls-ext",
  "caramelo",
- "deboa 0.1.5-beta.5",
+ "deboa",
  "deboa-h3",
  "deboa-test-utils",
  "deboa-tls",
@@ -448,7 +422,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e23ae8a4383a101403c6ed5fef95567c658f4bb592b5af45fbe9bfcecc48f3c9"
 dependencies = [
  "base64",
- "deboa 0.1.5-beta.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "deboa",
  "futures-util",
  "http",
  "hyper",
