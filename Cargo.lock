@@ -383,7 +383,7 @@ dependencies = [
 
 [[package]]
 name = "deboa-tokio"
-version = "0.1.4-beta.5"
+version = "0.1.4-beta.6"
 dependencies = [
  "async-native-tls-ext",
  "caramelo",
