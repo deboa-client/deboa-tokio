@@ -1,11 +1,5 @@
 #![doc = include_str!("../README.md")]
 #![deny(missing_docs)]
-use deboa::InnerClient;
-
-use crate::{
-    cert::{DeboaCertificate, DeboaIdentity},
-    client::{dns::DefaultDnsResolver, http::conn::pool::HttpConnectionPool},
-};
 #[cfg(all(
     feature = "rust-tls",
     not(feature = "native-tls"),
@@ -36,6 +30,16 @@ compile_error!("HTTP2 requires native-tls or rust-tls support.");
 #[cfg(all(feature = "native-tls", feature = "http3"))]
 compile_error!("HTTP3 is not supported within native-tls runtime.");
 
+use crate::{
+    cert::{DeboaCertificate, DeboaIdentity},
+    client::{DefaultDnsResolver, HttpConnectionPool},
+};
+pub use deboa::conn;
+pub use deboa::errors;
+pub use deboa::form;
+pub use deboa::request;
+pub use deboa::response;
+pub use deboa::{ClientBuilder, HttpClient, InnerClient, Result};
 /// Certificate management module for handling SSL/TLS certificates.
 pub mod cert;
 /// Internal module for HTTP and Websockets clients implementations.

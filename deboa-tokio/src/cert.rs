@@ -8,8 +8,8 @@
 #[cfg(feature = "native-tls")]
 use async_native_tls_ext::{Certificate as NativeCertificate, Identity as NativeIdentity};
 #[cfg(feature = "native-tls")]
-use deboa::cert::IdentityNativeExt;
-use deboa::cert::{Certificate as _, CertificateExt, ContentEncoding, IdentityExt};
+pub use deboa::cert::IdentityNativeExt;
+pub use deboa::cert::{Certificate as _, CertificateExt, ContentEncoding, IdentityExt};
 #[cfg(feature = "rust-tls")]
 use rustls::pki_types::{CertificateDer, PrivateKeyDer};
 

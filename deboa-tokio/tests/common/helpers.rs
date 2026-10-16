@@ -21,6 +21,8 @@ pub(crate) const SKIP_CERT_VERIFICATION: bool = cfg!(feature = "native-tls");
 #[allow(unreachable_code)]
 #[fixture]
 pub(crate) const fn protocol_version() -> Version {
+    #[cfg(not(any(feature = "http2", feature = "http3")))]
+    return Version::HTTP_11;
     #[cfg(feature = "http2")]
     return Version::HTTP_2;
     #[cfg(feature = "http3")]

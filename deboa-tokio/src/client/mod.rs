@@ -2,6 +2,10 @@
 //!
 //! This module provides DNS resolution, HTTP, TCP, and TLS transport functionality for the Deboa HTTP client.
 
-pub mod dns;
-pub mod http;
-pub mod tls;
+mod dns;
+mod http;
+mod tls;
+
+pub use dns::DefaultDnsResolver;
+pub use http::conn::DeboaConnection::*;
+pub use http::conn::pool::HttpConnectionPool;

@@ -205,7 +205,7 @@ pub(crate) async fn plain_stream_connect<'a>(ip: &IpAddr, port: u16) -> Result<T
 }
 
 /// Create a new plain connection.
-pub async fn create_plain_connection<'a>(
+pub(crate) async fn create_plain_connection<'a>(
     ip: &IpAddr,
     config: &'a ConnectionConfig<'a, DeboaIdentity, DeboaCertificate>,
 ) -> Result<DeboaConnection> {
@@ -228,7 +228,7 @@ pub async fn create_plain_connection<'a>(
 
 #[cfg(feature = "native-tls")]
 /// Create a new connection..into()
-pub async fn create_secure_connection<'a>(
+pub(crate) async fn create_secure_connection<'a>(
     ip: &IpAddr,
     config: &'a ConnectionConfig<'a, DeboaIdentity, DeboaCertificate>,
 ) -> Result<DeboaConnection> {
@@ -251,7 +251,7 @@ pub async fn create_secure_connection<'a>(
 
 #[cfg(feature = "rust-tls")]
 /// Create a new connection.
-pub async fn create_secure_connection<'a>(
+pub(crate) async fn create_secure_connection<'a>(
     ip: &IpAddr,
     config: &'a ConnectionConfig<'a, DeboaIdentity, DeboaCertificate>,
 ) -> Result<DeboaConnection> {
