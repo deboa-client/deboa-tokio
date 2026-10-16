@@ -14,7 +14,7 @@ use std::net::IpAddr;
 use tokio::net::TcpStream;
 
 /// Builder for TLS connections using native-tls
-pub struct TlsConnectionBuilder<'a> {
+pub(crate) struct TlsConnectionBuilder<'a> {
     tcp_stream: TcpStream,
     host: &'a str,
     identity: Option<&'a DeboaIdentity>,
@@ -117,7 +117,7 @@ impl<'a> TlsConnectionBuilder<'a> {
     }
 }
 
-pub async fn connect<'a>(
+pub(crate) async fn connect<'a>(
     ip: IpAddr,
     config: &ConnectionConfig<'a, DeboaIdentity, DeboaCertificate>,
 ) -> Result<TokioStream> {
