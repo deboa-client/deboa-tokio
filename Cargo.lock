@@ -449,6 +449,7 @@ dependencies = [
  "rustls-platform-verifier",
  "tokio",
  "tokio-rustls",
+ "tokio-util",
  "webpki-roots",
 ]
 
