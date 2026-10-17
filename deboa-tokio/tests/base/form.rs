@@ -88,7 +88,7 @@ async fn test_submit_multipart_form_file(
     protocol_version: http::Version,
 ) -> TestResult<()> {
     let mut server = create_server.await;
-    let file = File::open("README.md").await?;
+    let file = File::open("file.txt").await?;
     let stream = tokio_util::io::ReaderStream::new(file);
 
     let mock = Mock::of(
