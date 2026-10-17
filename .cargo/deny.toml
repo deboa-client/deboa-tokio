@@ -14,5 +14,4 @@ allow = [
 [advisories]
 ignore = [
     "RUSTSEC-2024-0436",
-    "RUSTSEC-2024-0449",
 ]

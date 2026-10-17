@@ -172,6 +172,7 @@ impl HttpConnectionDispatcher for DeboaConnection {
 /// * `sender` - The sender to use.
 pub struct BaseHttpConnection<Sender, ReqBody, ResBody> {
     pub(crate) sender: Sender,
+    #[allow(unused)]
     pub(crate) handle: JoinHandle<Result<()>>,
     pub(crate) req_body: PhantomData<ReqBody>,
     pub(crate) res_body: PhantomData<ResBody>,

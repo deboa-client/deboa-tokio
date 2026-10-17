@@ -34,12 +34,24 @@ use crate::{
     cert::{DeboaCertificate, DeboaIdentity},
     client::{DefaultDnsResolver, HttpConnectionPool},
 };
+
 pub use deboa::conn;
+#[cfg(feature = "cookies")]
+pub use deboa::cookie;
+pub use deboa::dns;
 pub use deboa::errors;
 pub use deboa::form;
 pub use deboa::request;
 pub use deboa::response;
-pub use deboa::{ClientBuilder, HttpClient, InnerClient, Result};
+pub use deboa::serde;
+pub use deboa::url;
+pub use deboa::{ClientBuilder, HttpClient, InnerClient, Result, TestResult};
+
+#[cfg(feature = "multipart")]
+pub use deboa_multipart::*;
+
+pub use hyper_body_utils::*;
+
 /// Certificate management module for handling SSL/TLS certificates.
 pub mod cert;
 /// Internal module for HTTP and Websockets clients implementations.

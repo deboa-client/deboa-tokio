@@ -1,6 +1,6 @@
 [package]
 name = "deboa-tokio"
-version = "0.1.4-beta.7"
+version = "0.1.4-beta.8"
 edition.workspace = true
 authors.workspace = true
 repository.workspace = true
@@ -36,7 +36,7 @@ default = [
 ]
 
 cookies = ["deboa/cookie"]
-multipart = ["deboa/multipart"]
+multipart = ["deboa-multipart/multi-threaded"]
 
 # tls
 rust-tls = [
@@ -82,9 +82,10 @@ websockets = ["deboa-ws/runtime-tokio"]
 [dependencies]
 async-native-tls-ext = { version = "0.6.0", optional = true, default-features = false }
 deboa.workspace = true
-deboa-h3 = { version = "0.1.3-beta.2", optional = true }
-deboa-tls = { version = "0.1.0-beta.4" }
-deboa-ws =  { version = "0.1.0-beta.4", optional = true }
+deboa-h3 = { version = "0.1.3-beta.3", optional = true }
+deboa-multipart = { version = "0.1.0-beta.1" }
+deboa-tls = { version = "0.1.0-beta.5" }
+deboa-ws =  { version = "0.1.0-beta.5", optional = true }
 futures = { version = "0.3.31", optional = true, default-features = false }
 h3 = { version = "0.0.8", optional = true, default-features = false }
 h3-quinn = { version = "0.0.10", optional = true , default-features = false }
@@ -111,7 +112,9 @@ tokio-rustls = { version = "0.26.5", optional = true, default-features = false }
 webpki-roots = { version = "1.0.6", optional = true, default-features = false }
 
 [dev-dependencies]
+bytes.workspace = true
 caramelo.workspace = true
+deboa-multipart = { version = "0.1.0-beta.1" }
 deboa-test-utils = { workspace = true }
 easyhttpmock-vetis-tokio = { version = "0.1.2-beta.5", features = [
   "http2",

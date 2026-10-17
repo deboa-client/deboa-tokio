@@ -14,7 +14,7 @@ use std::net::IpAddr;
 use tokio::net::TcpStream;
 
 /// Builder for TLS connections using native-tls
-pub(crate) struct TlsConnectionBuilder<'a> {
+pub(super) struct TlsConnectionBuilder<'a> {
     tcp_stream: TcpStream,
     host: &'a str,
     identity: Option<&'a DeboaIdentity>,
@@ -25,7 +25,7 @@ pub(crate) struct TlsConnectionBuilder<'a> {
 
 impl<'a> TlsConnectionBuilder<'a> {
     /// Creates a new TLS connection builder
-    pub fn new(tcp_stream: TcpStream, host: &'a str) -> Self {
+    pub(super) fn new(tcp_stream: TcpStream, host: &'a str) -> Self {
         Self {
             tcp_stream,
             host,
@@ -37,31 +37,31 @@ impl<'a> TlsConnectionBuilder<'a> {
     }
 
     /// Sets the client identity for mutual TLS authentication
-    pub fn identity(mut self, identity: Option<&'a DeboaIdentity>) -> Self {
+    pub(super) fn identity(mut self, identity: Option<&'a DeboaIdentity>) -> Self {
         self.identity = identity;
         self
     }
 
     /// Sets the server certificate for verification
-    pub fn certificate(mut self, certificate: Option<&'a DeboaCertificate>) -> Self {
+    pub(super) fn certificate(mut self, certificate: Option<&'a DeboaCertificate>) -> Self {
         self.certificate = certificate;
         self
     }
 
     /// Skips server certificate verification (use with caution)
-    pub fn skip_server_verification(mut self, skip_server_verification: bool) -> Self {
+    pub(super) fn skip_server_verification(mut self, skip_server_verification: bool) -> Self {
         self.skip_server_verification = skip_server_verification;
         self
     }
 
     /// Sets the ALPN protocols to use
-    pub fn alpn(mut self, alpn: &'a [&str]) -> Self {
+    pub(super) fn alpn(mut self, alpn: &'a [&str]) -> Self {
         self.alpn = alpn;
         self
     }
 
     /// Establishes the TLS connection
-    pub async fn connect(self) -> Result<TlsStream<TcpStream>> {
+    pub(super) async fn connect(self) -> Result<TlsStream<TcpStream>> {
         let builder = TlsConnector::new();
 
         let builder = if self.skip_server_verification {
